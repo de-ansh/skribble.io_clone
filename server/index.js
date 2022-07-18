@@ -33,6 +33,7 @@ io.on('connection',(socket)=>{
             const word = getword();
         }catch(err){
 
+            
         }
     })
 })
