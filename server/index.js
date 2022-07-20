@@ -6,6 +6,7 @@ const port= process.env.port || 3000;
 var server = http.createServer(app);
 const mongoose = require("mongoose");
 var io = require("socket.io")(server);
+const getword=require('./api/getWord');
 
 
 //middleware
@@ -30,9 +31,24 @@ io.on('connection',(socket)=>{
                 return;
             }
             let room = new Room();
-            const word = getword();
+            const word = getWord();
+            room.word=word;
+            room.name= name;
+            room.occupancy= occupancy;
+            room.maxRounds= maxRounds;
+
+            let player={
+                socketID: socket.id,
+                nickname,
+                isPartyLeader: true,
+            }
+            room.players.push(player);
+            room= await room.save();
+            socket.join(room);
+            io.to(name).emit('updateRoom',room);
         }catch(err){
 
+            console.log(err);
             
         }
     })
